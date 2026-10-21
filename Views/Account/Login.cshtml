@@ -1,0 +1,64 @@
+﻿@model _1131605.Models.User
+
+@{
+    ViewData["Title"] = "系統登入";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登入 - 決策系統</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body style="background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%); min-height: 100vh; display: flex; align-items: center; color: #2c3e50;">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-8 col-md-6 col-lg-4">
+
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-dark" style="letter-spacing: 1px;">歡迎登入</h2>
+                </div>
+                @if (!Html.ViewData.ModelState.IsValid)
+                {
+                    <div class="text-center text-danger small fw-bold mb-3" style="letter-spacing: 0.5px;">
+                        帳號或密碼輸入錯誤，請重新確認。
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+
+                    <div class="form-group mb-3">
+                        <label class="form-label small fw-bold text-dark">帳號</label>
+                        <input type="text" name="username" class="form-control px-3 py-2"
+                               placeholder="請輸入帳號" style="border-radius: 4px; border: 1px solid #7f8c8d;" required />
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label small fw-bold text-dark">密碼</label>
+                        <input type="password" name="password" class="form-control px-3 py-2"
+                               placeholder="請輸入密碼" style="border-radius: 4px; border: 1px solid #7f8c8d;" required />
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark py-2.5 fw-bold" style="border-radius: 4px; letter-spacing: 2px; font-size: 1rem;">
+                            認證並登入
+                        </button>
+                    </div>
+
+                </form>
+
+
+                <div class="text-center mt-4">
+                    <small class="text-muted">預設測試帳號：<span class="text-dark fw-bold">abcd</span> / 密碼：<span class="text-dark fw-bold">abcd1122</span></small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

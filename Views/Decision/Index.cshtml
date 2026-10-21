@@ -1,0 +1,252 @@
+﻿@{
+    ViewData["Title"] = "決策大廳";
+}
+
+<style>
+    .glow-card {
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .glow-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+    .btn-draw-effect {
+        transition: all 0.3s ease;
+        border-radius: 6px;
+    }
+
+        .btn-draw-effect:hover {
+            background-color: #111 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+</style>
+
+<div class="container pb-5">
+
+    <div class="text-center text-lg-start my-5 pt-2">
+        <h1 class="display-4 fw-bold text-dark mb-2" style="letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.03);">決策大廳</h1>
+        <p class="text-secondary fs-5 mb-0">請選擇今日想進行分析的消費類別與篩選策略</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger border-0 small py-2.5 text-center mb-4 shadow-sm" style="border-radius: 8px; background: rgba(220, 53, 69, 0.12); color: #842029;">
+            ⚠️ @ViewBag.Error
+        </div>
+    }
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-4">
+            <div class="p-4 d-flex flex-column justify-content-between h-100 glow-card">
+                <div class="mb-4 py-2 border-bottom border-dark border-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="fw-bold text-dark m-0">餐點選擇</h3>
+                    </div>
+                    <small class="text-secondary d-block mt-1">排除喜好度低於 2.0 之黑名單</small>
+                </div>
+
+                <form asp-controller="Decision" asp-action="Draw" method="post">
+                    <input type="hidden" name="category" value="Dinner" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">選擇分析象限</label>
+                        <select name="strategy" class="form-select text-dark border-secondary" style="border-radius: 6px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.15);">
+                            <option value="HighRatingHighPrice">犒賞自己</option>
+                            <option value="HighRatingLowPrice">物超所值</option>
+                            <option value="LowRatingLowPrice">平價便利</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <button class="btn btn-sm btn-outline-secondary w-100 mb-2 fw-semibold text-dark border-dark border-opacity-20" type="button" data-bs-toggle="collapse" data-bs-target="#panelDinner" aria-expanded="false" style="border-radius: 8px; background: rgba(255,255,255,0.2); font-size: 0.8rem;">
+                            設定進階限制與隨機引擎
+                        </button>
+                        <div class="collapse" id="panelDinner">
+                            <div class="p-3 rounded-3 text-start mb-1" style="background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px);">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary style-label" style="font-size:0.75rem;">最高預算限制</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white bg-opacity-40 text-secondary">$</span>
+                                            <input type="number" name="maxPrice" class="form-control bg-white bg-opacity-40 text-dark" placeholder="不限" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary" style="font-size:0.75rem;">最低評分門檻</label>
+                                        <select name="minRating" class="form-select form-select-sm bg-white bg-opacity-40 text-dark">
+                                            <option value="">全部</option>
+                                            <option value="4.5">4.5★極佳</option>
+                                            <option value="4.0">4.0★優質</option>
+                                            <option value="3.0">3.0★普通</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-top border-white border-opacity-25">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollNormalDinner" value="Normal" checked>
+                                        <label class="form-check-label small text-secondary" for="rollNormalDinner" style="font-size:0.8rem;">隨機盲抽</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollWeightDinner" value="Weight">
+                                        <label class="form-check-label small fw-bold text-dark" for="rollWeightDinner" style="font-size:0.8rem;">喜好度加權智慧抽</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2.5 fw-bold btn-draw-effect" style="font-size: 0.95rem;">
+                        執行抽選
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 d-flex flex-column justify-content-between h-100 glow-card">
+                <div class="mb-4 py-2 border-bottom border-dark border-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="fw-bold text-dark m-0">購買物品</h3>
+                    </div>
+                    <small class="text-secondary d-block mt-1">排除喜好度低於 2.0 之黑名單</small>
+                </div>
+
+                <form asp-controller="Decision" asp-action="Draw" method="post">
+                    <input type="hidden" name="category" value="Shop" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">選擇分析象限</label>
+                        <select name="strategy" class="form-select text-dark border-secondary" style="border-radius: 6px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.15);">
+                            <option value="HighRatingHighPrice">精緻耐用</option>
+                            <option value="HighRatingLowPrice">高性價比</option>
+                            <option value="LowRatingLowPrice">便宜實惠</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <button class="btn btn-sm btn-outline-secondary w-100 mb-2 fw-semibold text-dark border-dark border-opacity-20" type="button" data-bs-toggle="collapse" data-bs-target="#panelShop" aria-expanded="false" style="border-radius: 8px; background: rgba(255,255,255,0.2); font-size: 0.8rem;">
+                            設定進階限制與隨機引擎
+                        </button>
+                        <div class="collapse" id="panelShop">
+                            <div class="p-3 rounded-3 text-start mb-1" style="background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px);">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary" style="font-size:0.75rem;">最高預算限制</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white bg-opacity-40 text-secondary">$</span>
+                                            <input type="number" name="maxPrice" class="form-control bg-white bg-opacity-40 text-dark" placeholder="不限" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary" style="font-size:0.75rem;">最低評分門檻</label>
+                                        <select name="minRating" class="form-select form-select-sm bg-white bg-opacity-40 text-dark">
+                                            <option value="">全部</option>
+                                            <option value="4.5">4.5★極佳</option>
+                                            <option value="4.0">4.0★優質</option>
+                                            <option value="3.0">3.0★普通</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-top border-white border-opacity-25">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollNormalShop" value="Normal" checked>
+                                        <label class="form-check-label small text-secondary" for="rollNormalShop" style="font-size:0.8rem;">隨機盲抽</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollWeightShop" value="Weight">
+                                        <label class="form-check-label small fw-bold text-dark" for="rollWeightShop" style="font-size:0.8rem;">喜好度加權智慧抽</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2.5 fw-bold btn-draw-effect" style="font-size: 0.95rem;">
+                        執行智慧抽選
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 d-flex flex-column justify-content-between h-100 glow-card">
+                <div class="mb-4 py-2 border-bottom border-dark border-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="fw-bold text-dark m-0">旅遊景點</h3>
+                    </div>
+                    <small class="text-secondary d-block mt-1">排除喜好度低於 2.0 之黑名單</small>
+                </div>
+
+                <form asp-controller="Decision" asp-action="Draw" method="post">
+                    <input type="hidden" name="category" value="Travel" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">選擇分析象限</label>
+                        <select name="strategy" class="form-select text-dark border-secondary" style="border-radius: 6px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.15);">
+                            <option value="HighRatingHighPrice">深度奢華</option>
+                            <option value="HighRatingLowPrice">私房秘境</option>
+                            <option value="LowRatingLowPrice">輕鬆散步</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <button class="btn btn-sm btn-outline-secondary w-100 mb-2 fw-semibold text-dark border-dark border-opacity-20" type="button" data-bs-toggle="collapse" data-bs-target="#panelTravel" aria-expanded="false" style="border-radius: 8px; background: rgba(255,255,255,0.2); font-size: 0.8rem;">
+                            設定進階限制與隨機引擎
+                        </button>
+                        <div class="collapse" id="panelTravel">
+                            <div class="p-3 rounded-3 text-start mb-1" style="background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px);">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary" style="font-size:0.75rem;">最高預算限制</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white bg-opacity-40 text-secondary">$</span>
+                                            <input type="number" name="maxPrice" class="form-control bg-white bg-opacity-40 text-dark" placeholder="不限" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-secondary" style="font-size:0.75rem;">最低評分門檻</label>
+                                        <select name="minRating" class="form-select form-select-sm bg-white bg-opacity-40 text-dark">
+                                            <option value="">全部</option>
+                                            <option value="4.5">4.5★極佳</option>
+                                            <option value="4.0">4.0★優質</option>
+                                            <option value="3.0">3.0★普通</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-top border-white border-opacity-25">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollNormalTravel" value="Normal" checked>
+                                        <label class="form-check-label small text-secondary" for="rollNormalTravel" style="font-size:0.8rem;">隨機盲抽</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="rollType" id="rollWeightTravel" value="Weight">
+                                        <label class="form-check-label small fw-bold text-dark" for="rollWeightTravel" style="font-size:0.8rem;">喜好度加權智慧抽</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2.5 fw-bold btn-draw-effect" style="font-size: 0.95rem;">
+                        執行智慧抽選
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="my-5 pt-3"></div>
+</div>

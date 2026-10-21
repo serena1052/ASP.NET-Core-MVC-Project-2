@@ -1,0 +1,114 @@
+﻿@model _1131605.Models.Item
+
+@{
+    ViewData["Title"] = "決策結果";
+    string categoryName = Model.Category == "Dinner" ? "餐點" :
+                          Model.Category == "Shop" ? "物資" : "景點";
+
+    string priceLevel = Model.Price <= 150 ? "經濟實惠" : Model.Price <= 500 ? "平價適中" : "高奢消費";
+    string priceBadge = Model.Price <= 150 ? "bg-secondary bg-opacity-20 text-dark" :
+                        Model.Price <= 500 ? "bg-dark bg-opacity-10 text-dark" :
+                        "bg-danger bg-opacity-10 text-danger";
+
+    string currentStrategy = Context.Request.Form["strategy"];
+}
+
+<style>
+    .glass-result-card {
+        background: rgba(255, 255, 0255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        position: relative;
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+        transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+        .glass-result-card.card-reveal {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+    .info-table-box {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+    }
+</style>
+
+<div class="container my-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <p class="text-muted small mb-4">
+                <a asp-action="Index" class="text-decoration-none text-secondary">決策大廳</a> &gt;
+                <span class="text-dark fw-bold">抽選結果</span>
+            </p>
+
+            <div id="resultCard" class="card glass-result-card border-0 overflow-hidden">
+                <div class="card-body p-5 text-center">
+
+                    <div class="mb-2">
+                        <span class="badge bg-dark text-white px-3 py-1.5 rounded-pill small">
+                            @categoryName
+                        </span>
+                        <span class="badge @priceBadge px-3 py-1.5 rounded-pill small ms-1">
+                            @priceLevel
+                        </span>
+                    </div>
+
+                    <h1 class="display-6 fw-bold text-dark my-4" style="letter-spacing: -0.5px;">
+                        @Model.Name
+                    </h1>
+
+                    <div class="mx-auto my-4 border-top border-dark border-opacity-15" style="width: 50px;"></div>
+
+                    <div class="p-3 info-table-box mx-auto" style="max-width: 340px;">
+                        <table class="table table-borderless text-start mb-0 align-middle">
+                            <tbody>
+                                <tr>
+                                    <td class="text-secondary small py-2" style="width: 45%;">實測消費</td>
+                                    <td class="fw-bold text-dark py-2 text-end">$ @Model.Price 元</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary small py-2">滿意指引</td>
+                                    <td class="fw-bold text-dark py-2 text-end">
+                                        @Model.Rating <span class="text-muted small fw-normal">/ 5.0</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-dark bg-opacity-5 border-top-0 d-flex justify-content-between px-4 py-3 align-items-center">
+
+                    <form asp-controller="Decision" asp-action="Draw" method="post" class="m-0">
+                        <input type="hidden" name="category" value="@Model.Category" />
+                        <input type="hidden" name="strategy" value="@currentStrategy" />
+                        <button type="submit" class="btn btn-sm btn-outline-dark px-3 fw-bold" style="border-radius: 6px;">
+                            ↩ 再抽一次
+                        </button>
+                    </form>
+
+                    <a asp-controller="Item" asp-action="Index" class="btn btn-sm btn-dark px-3 fw-bold" style="border-radius: 6px;">
+                        前往候選池➔
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            document.getElementById("resultCard").classList.add("card-reveal");
+        }, 150); 
+    });
+</script>

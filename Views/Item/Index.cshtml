@@ -1,0 +1,296 @@
+﻿@model IEnumerable<_1131605.Models.Item>
+
+@{
+    ViewData["Title"] = "決策候選池數據總覽";
+
+    var dinnerList = Model?.Where(i => i.Category == "Dinner").ToList() ?? new List<_1131605.Models.Item>();
+    var shopList = Model?.Where(i => i.Category == "Shop").ToList() ?? new List<_1131605.Models.Item>();
+    var travelList = Model?.Where(i => i.Category == "Travel").ToList() ?? new List<_1131605.Models.Item>();
+}
+
+<style>
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
+    }
+
+    .board-header {
+        background: rgba(0, 0, 0, 0.04);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.35) !important;
+        transition: background-color 0.15s ease;
+    }
+
+
+    .custom-pagination .page-link {
+        color: #212529;
+        background-color: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 5px 12px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+
+    .custom-pagination .page-item.active .page-link {
+        background-color: #212529;
+        border-color: #212529;
+        color: #fff;
+    }
+
+    .custom-pagination .page-link:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+<div class="container pb-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center my-5 pt-2 gap-3">
+        <div>
+            <h1 class="display-4 fw-bold text-dark mb-2" style="letter-spacing: -1px;">決策候選池數據總覽</h1>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <form asp-action="Index" method="get" class="d-flex m-0">
+                <div class="input-group input-group-sm" style="max-width: 260px;">
+                    <input type="text" name="searchString" class="form-control bg-white bg-opacity-50 border-secondary text-dark"
+                           placeholder="搜尋項目名稱..." value="@ViewBag.CurrentSearch" style="border-radius: 6px 0 0 6px;" />
+                    <button type="submit" class="btn btn-outline-dark fw-bold px-3" style="border-radius: 0 6px 6px 0;">🔍</button>
+                </div>
+                @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+                {
+                    <a asp-action="Index" class="btn btn-sm btn-link text-secondary text-decoration-none ms-1 align-self-center">清除</a>
+                }
+            </form>
+
+            <a asp-action="Create" class="btn btn-dark px-4 py-2 fw-bold" style="border-radius: 6px; font-size: 0.88rem;">
+                新增生活品項
+            </a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+    {
+        <p class="text-secondary small mb-4">
+            💡 正在顯示關鍵字「<span class="text-dark fw-bold">@ViewBag.CurrentSearch</span>」的搜尋篩選結果：
+        </p>
+    }
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+            <div class="card glass-panel border-0 overflow-hidden h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="board-header px-4 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold text-dark">🍽️ 餐點選擇</h5>
+                        <span class="badge bg-dark rounded-pill">@dinnerList.Count 筆</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tableDinner" style="background: transparent;">
+                                <thead class="table-light bg-opacity-50 text-secondary border-bottom" style="font-size: 0.88rem;">
+                                    <tr>
+                                        <th class="ps-4 py-2.5 fw-bold">項目 / 店家名稱</th>
+                                        <th class="py-2.5 fw-bold" style="width: 25%;">預估消費</th>
+                                        <th class="py-2.5 fw-bold" style="width: 20%;">喜好度</th>
+                                        <th class="pe-4 py-2.5 fw-bold text-end" style="width: 25%;">資料操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in dinnerList)
+                                    {
+                                        <tr class="border-bottom border-dark border-opacity-5 timeline-row">
+                                            <td class="ps-4 py-3 fw-bold text-dark">@item.Name</td>
+                                            <td class="py-3 text-secondary fw-semibold">$ @item.Price 元</td>
+                                            <td class="py-3 fw-bold">@item.Rating <span class="text-muted small fw-normal">/ 5.0</span></td>
+                                            <td class="pe-4 py-3 text-end">
+                                                <a asp-action="Edit" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-dark px-2 py-0.5 fw-bold" style="border-radius: 4px; font-size: 0.8rem;">修改</a>
+                                                <a asp-action="Delete" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-danger px-2 py-0.5 fw-bold ms-1" style="border-radius: 4px; font-size: 0.8rem;" onclick="return confirm('確定要刪除嗎？');">刪除</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!dinnerList.Any())
+                                    {
+                                        <tr><td colspan="4" class="text-center py-4 text-muted small">暫無符合的餐點數據</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 d-flex justify-content-center border-top border-dark border-opacity-5">
+                    <ul class="pagination pagination-sm m-0 custom-pagination" id="pagerDinner"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card glass-panel border-0 overflow-hidden h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="board-header px-4 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold text-dark">🛍️ 購買物品</h5>
+                        <span class="badge bg-secondary rounded-pill">@shopList.Count 筆</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tableShop" style="background: transparent;">
+                                <thead class="table-light bg-opacity-50 text-secondary border-bottom" style="font-size: 0.88rem;">
+                                    <tr>
+                                        <th class="ps-4 py-2.5 fw-bold">項目 / 店家名稱</th>
+                                        <th class="py-2.5 fw-bold" style="width: 25%;">預估消費</th>
+                                        <th class="py-2.5 fw-bold" style="width: 20%;">喜好度</th>
+                                        <th class="pe-4 py-2.5 fw-bold text-end" style="width: 25%;">資料操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in shopList)
+                                    {
+                                        <tr class="border-bottom border-dark border-opacity-5 timeline-row">
+                                            <td class="ps-4 py-3 fw-bold text-dark">@item.Name</td>
+                                            <td class="py-3 text-secondary fw-semibold">$ @item.Price 元</td>
+                                            <td class="py-3 fw-bold">@item.Rating <span class="text-muted small fw-normal">/ 5.0</span></td>
+                                            <td class="pe-4 py-3 text-end">
+                                                <a asp-action="Edit" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-dark px-2 py-0.5 fw-bold" style="border-radius: 4px; font-size: 0.8rem;">修改</a>
+                                                <a asp-action="Delete" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-danger px-2 py-0.5 fw-bold ms-1" style="border-radius: 4px; font-size: 0.8rem;" onclick="return confirm('確定要刪除嗎？');">刪除</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!shopList.Any())
+                                    {
+                                        <tr><td colspan="4" class="text-center py-4 text-muted small">暫無符合的物品數據</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 d-flex justify-content-center border-top border-dark border-opacity-5">
+                    <ul class="pagination pagination-sm m-0 custom-pagination" id="pagerShop"></ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card glass-panel border-0 overflow-hidden d-flex flex-column justify-content-between">
+                <div>
+                    <div class="board-header px-4 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold text-dark">✈️ 旅遊景點</h5>
+                        <span class="badge bg-light text-dark border rounded-pill">@travelList.Count 筆</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tableTravel" style="background: transparent;">
+                                <thead class="table-light bg-opacity-50 text-secondary border-bottom" style="font-size: 0.88rem;">
+                                    <tr>
+                                        <th class="ps-4 py-2.5 fw-bold">項目 / 店家名稱</th>
+                                        <th class="py-2.5 fw-bold" style="width: 25%;">預估消費</th>
+                                        <th class="py-2.5 fw-bold" style="width: 20%;">喜好度</th>
+                                        <th class="pe-4 py-2.5 fw-bold text-end" style="width: 25%;">資料操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in travelList)
+                                    {
+                                        <tr class="border-bottom border-dark border-opacity-5 timeline-row">
+                                            <td class="ps-4 py-3 fw-bold text-dark">@item.Name</td>
+                                            <td class="py-3 text-secondary fw-semibold">$ @item.Price 元</td>
+                                            <td class="py-3 fw-bold">@item.Rating <span class="text-muted small fw-normal">/ 5.0</span></td>
+                                            <td class="pe-4 py-3 text-end">
+                                                <a asp-action="Edit" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-dark px-2 py-0.5 fw-bold" style="border-radius: 4px; font-size: 0.8rem;">修改</a>
+                                                <a asp-action="Delete" asp-route-id="@item.ItemId" class="btn btn-sm btn-outline-danger px-2 py-0.5 fw-bold ms-1" style="border-radius: 4px; font-size: 0.8rem;" onclick="return confirm('確定要刪除嗎？');">刪除</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!travelList.Any())
+                                    {
+                                        <tr><td colspan="4" class="text-center py-4 text-muted small">暫無符合的景點數據</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 d-flex justify-content-center border-top border-dark border-opacity-5">
+                    <ul class="pagination pagination-sm m-0 custom-pagination" id="pagerTravel"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 5; 
+
+        setupPagination('tableDinner', 'pagerDinner', rowsPerPage);
+        setupPagination('tableShop', 'pagerShop', rowsPerPage);
+        setupPagination('tableTravel', 'pagerTravel', rowsPerPage);
+
+        function setupPagination(tableId, pagerId, limit) {
+            const table = document.getElementById(tableId);
+            const pager = document.getElementById(pagerId);
+            if (!table || !pager) return;
+
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr.timeline-row'));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / limit);
+
+            if (totalPages <= 1) {
+                pager.innerHTML = "";
+
+                rows.forEach(row => row.style.display = "");
+                return;
+            }
+
+            function renderPager(activePage) {
+                pager.innerHTML = "";
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === activePage ? 'active' : ''}`;
+
+                    const a = document.createElement('a');
+                    a.className = 'page-link shadow-none';
+                    a.href = '#';
+                    a.innerText = i;
+
+                    a.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        showPage(i);
+                    });
+
+                    li.appendChild(a);
+                    pager.appendChild(li);
+                }
+            }
+
+            function showPage(page) {
+                const start = (page - 1) * limit;
+                const end = start + limit;
+
+                rows.forEach((row, index) => {
+                    if (index >= start && index < end) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                renderPager(page);
+            }
+
+            showPage(1);
+        }
+    });
+</script>

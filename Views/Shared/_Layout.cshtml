@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body style="background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%); min-height: 100vh; background-attachment: fixed; color: #2c3e50;">
+
+    <header class="container pt-3">
+        <nav class="navbar navbar-expand-sm navbar-light px-4" style="background: rgba(255, 255, 255, 0.25); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+            <div class="container-fluid p-0">
+                <a class="navbar-brand fw-bold text-dark fs-4" style="letter-spacing: -1px;" asp-controller="Decision" asp-action="Index">決策系統</a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ps-sm-4">
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-dark fw-bold px-0" asp-controller="Decision" asp-action="Index">決策大廳</a>
+                        </li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-dark fw-bold px-0" asp-controller="Item" asp-action="Index">項目管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-bold px-0" asp-controller="Dashboard" asp-action="Index">數據後台</a>
+                        </li>
+                    </ul>
+               
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-bold px-0" asp-controller="Account" asp-action="Logout">登出系統</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-5 pt-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

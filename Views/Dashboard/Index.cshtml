@@ -1,0 +1,186 @@
+﻿@{
+    ViewData["Title"] = "數據分析後台";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+        }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #198754;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 10px rgba(25, 135, 84, 0.6);
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+        }
+
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 6px rgba(25, 135, 84, 0);
+        }
+
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+        }
+    }
+</style>
+
+<div class="container pb-5">
+
+    <div class="my-5 pt-2 text-center text-lg-start">
+        <h1 class="display-4 fw-bold text-dark mb-2" style="letter-spacing: -1px;">數據後台</h1>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="p-4 dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">晚餐品項總計</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <span class="display-5 fw-bold text-dark">@ViewBag.DinnerCount</span>
+                    <span class="text-secondary fw-bold ms-2">筆</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">商品品項總計</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <span class="display-5 fw-bold text-dark">@ViewBag.ShopCount</span>
+                    <span class="text-secondary fw-bold ms-2">筆</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">景點品項總計</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <span class="display-5 fw-bold text-dark">@ViewBag.TravelCount</span>
+                    <span class="text-secondary fw-bold ms-2">筆</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="p-4 dashboard-card h-100">
+                <h5 class="fw-bold text-dark mb-4" style="font-size: 1.05rem; letter-spacing: 0.5px;">全品項消費金額區間分佈</h5>
+                <div class="mx-auto" style="max-width: 280px; max-height: 280px;">
+                    <canvas id="pricePieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="p-4 dashboard-card h-100">
+                <h5 class="fw-bold text-dark mb-4" style="font-size: 1.05rem; letter-spacing: 0.5px;">三大類別平均個人喜好度比較</h5>
+                <div class="w-100 mt-2" style="height: 250px;">
+                    <canvas id="ratingBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 text-dark rounded-3 mb-4" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);">
+        <div class="d-flex align-items-center mb-2">
+            <div class="status-dot me-2"></div>
+            <h4 class="fw-bold m-0" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                遠端資料庫連線狀態：<span class="text-success">@ViewBag.DbStatus</span>
+            </h4>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const ctxPie = document.getElementById('pricePieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['經濟實惠 (≤150元)', '平價適中 (151~500元)', '高奢消費 (>500元)'],
+                datasets: [{
+                    data: [@ViewBag.PriceLow, @ViewBag.PriceMedium, @ViewBag.PriceHigh],
+                    backgroundColor: [
+                        'rgba(108, 117, 125, 0.6)',  
+                        'rgba(52, 58, 64, 0.75)',   
+                        'rgba(220, 53, 69, 0.6)'    
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.7)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } }
+                }
+            }
+        });
+
+        const ctxBar = document.getElementById('ratingBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['餐點選擇', '購買物品', '旅遊景點'],
+                datasets: [{
+                    label: '平均滿意星等',
+                    data: [
+                        @string.Format("{0:0.0}", ViewBag.DinnerAvgRating),
+                        @string.Format("{0:0.0}", ViewBag.ShopAvgRating),
+                        @string.Format("{0:0.0}", ViewBag.TravelAvgRating)
+                    ],
+                    backgroundColor: 'rgba(33, 37, 41, 0.7)',
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y', 
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { min: 0, max: 5, grid: { display: false }, ticks: { stepSize: 1 } },
+                    y: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false } 
+                }
+            }
+        });
+
+    });
+</script>
